@@ -2,10 +2,16 @@
 
 namespace Core;
 
+use App\Services\ViewService;
+
 class Router
 {
+    private ViewService $viewService;
 
-    private string $prefix = "/eskuelmyadmin/";
+    public function __construct(ViewService $viewService){
+        $this->viewService = $viewService;
+    }
+    private string $prefix = "/eskuelmyadmin";
     protected array $routes = [
         'GET' => [],
         'POST' => [],
@@ -28,29 +34,29 @@ class Router
 
     public  function get($uri, $action): void
     {
-        $normalized = $this->normalizeUri($this->prefix . $uri);
+        $normalized = $this->normalizeUri($uri);
         $this->routes['GET'][$normalized] = $action;
     }
 
 
     public function post($uri, $action): void
     {
-        $normalized = $this->normalizeUri($this->prefix . $uri);
+        $normalized = $this->normalizeUri($uri);
         $this->routes['POST'][$normalized] = $normalized;
     }
 
     public function put($uri, $action): void{
-        $normalized = $this->normalizeUri($this->prefix . $uri);
+        $normalized = $this->normalizeUri($uri);
         $this->routes['PUT'][$normalized] = $action;
     }
 
     public function patch($uri, $action): void{
-        $normalized = $this->normalizeUri($this->prefix . $uri);
+        $normalized = $this->normalizeUri($uri);
         $this->routes['PATCH'][$normalized] = $action;
     }
 
     public function delete($uri, $action): void{
-        $normalized = $this->normalizeUri($this->prefix . $uri);
+        $normalized = $this->normalizeUri($uri);
         $this->routes['DELETE'][$normalized] = $action;
     }
 
@@ -64,14 +70,19 @@ class Router
             $controllerClass = "App\\Controllers\\{$controller}";
 
             if (class_exists($controllerClass)) {
-                $instance = new $controllerClass;
+                $instance = Container::make($controllerClass);
                 if (method_exists($instance, $method)) {
                     return $instance->$method();
                 }
             }
         }
 
-        http_response_code(404);
-        echo "404 Not Found";
+        return $this->viewService->render("errors/404.tpl");
+    }
+
+    public function redirect(string $uri) :void
+    {
+        header("Location: $this->prefix/index.php?path=$uri");
+        exit;
     }
 }
