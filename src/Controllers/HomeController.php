@@ -2,6 +2,7 @@
 namespace App\Controllers;
 
 use App\Services\ViewService;
+use Core\Response;
 
 class HomeController
 {
@@ -19,6 +20,6 @@ class HomeController
             'items' => ['Jeden', 'Dwa', 'Trzy']
         ];
 
-        echo $this->view->render('home.tpl', $data);
+        return $this->view->render('home.tpl', $data);
     }
 }

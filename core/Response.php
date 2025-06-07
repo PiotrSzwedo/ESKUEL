@@ -11,10 +11,10 @@ class Response
         echo $content;
     }
 
-    public static function json(array $data, int $status = 200): void
+    public static function json(array $data, int $status = 200): string|false
     {
         http_response_code($status);
         header('Content-Type: application/json');
-        echo json_encode($data);
+        return json_encode($data);
     }
 }

@@ -1,6 +1,7 @@
 <?php
 namespace App\Services;
 
+use Smarty\Exception;
 use Smarty\Smarty;
 
 class ViewService
@@ -21,6 +22,10 @@ class ViewService
         foreach ($data as $key => $value) {
             $this->smarty->assign($key, $value);
         }
-        return $this->smarty->fetch($template);
+        try {
+            return $this->smarty->fetch($template);
+        } catch (Exception $e) {
+            return $e->getMessage();
+        }
     }
 }

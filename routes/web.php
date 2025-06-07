@@ -1,6 +1,6 @@
 <?php
 
 use Core\Router;
-$router = new Router;
+$router = \Core\Container::make(Router::class);
 
 $router->get('/', 'HomeController@index');
