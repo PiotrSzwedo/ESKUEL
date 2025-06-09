@@ -3,6 +3,8 @@
 namespace Core;
 
 use App\Services\ViewService;
+use Exception;
+use ReflectionMethod;
 
 class Router
 {
@@ -35,29 +37,29 @@ class Router
     public  function get($uri, $action): void
     {
         $normalized = $this->normalizeUri($uri);
-        $this->routes['GET'][$normalized] = $action;
+        $this->routes['GET'][$normalized] = ["class" => $action[0], "method" => $action[1]];
     }
 
 
     public function post($uri, $action): void
     {
         $normalized = $this->normalizeUri($uri);
-        $this->routes['POST'][$normalized] = $normalized;
+        $this->routes['POST'][$normalized] = ["class" => $action[0], "method" => $action[1]];
     }
 
     public function put($uri, $action): void{
         $normalized = $this->normalizeUri($uri);
-        $this->routes['PUT'][$normalized] = $action;
+        $this->routes['PUT'][$normalized] = ["class" => $action[0], "method" => $action[1]];
     }
 
     public function patch($uri, $action): void{
         $normalized = $this->normalizeUri($uri);
-        $this->routes['PATCH'][$normalized] = $action;
+        $this->routes['PATCH'][$normalized] = ["class" => $action[0], "method" => $action[1]];
     }
 
     public function delete($uri, $action): void{
         $normalized = $this->normalizeUri($uri);
-        $this->routes['DELETE'][$normalized] = $action;
+        $this->routes['DELETE'][$normalized] = ["class" => $action[0], "method" => $action[1]];
     }
 
     public function dispatch($uri, $method)
@@ -66,14 +68,39 @@ class Router
         $uri = $this->normalizeUri($uri);
 
         if (isset($this->routes[$method][$uri])) {
-            [$controller, $method] = explode('@', $this->routes[$method][$uri]);
-            $controllerClass = "App\\Controllers\\{$controller}";
+            $route = $this->routes[$method][$uri];
+            $controllerClass = $route['class'] ?? null;
+            $controllerMethod = $route['method'] ?? null;
 
-            if (class_exists($controllerClass)) {
-                $instance = Container::make($controllerClass);
-                if (method_exists($instance, $method)) {
-                    return $instance->$method();
+            if (!$controllerClass || !class_exists($controllerClass)) {
+                throw new Exception("Kontroler {$controllerClass} nie istnieje.");
+            }
+
+            $controllerInstance = Container::make($controllerClass);
+            if (!method_exists($controllerInstance, $controllerMethod)) {
+                throw new Exception("Metoda {$controllerMethod} nie istnieje w klasie {$controllerClass}");
+            }
+
+            $methodReflection = new ReflectionMethod($controllerInstance, $controllerMethod);
+            $params = $methodReflection->getParameters();
+
+            $args = [];
+            foreach ($params as $param) {
+                $paramClass = $param->getType()?->getName();
+
+                if ($paramClass && class_exists($paramClass)) {
+                    $args[] = \Core\Container::make($paramClass);
+                } elseif ($param->isDefaultValueAvailable()) {
+                    $args[] = $param->getDefaultValue();
+                } else {
+                    throw new Exception("Nie można rozwiązać parametru: {$param->getName()}");
                 }
+            }
+
+            try {
+                return $methodReflection->invokeArgs($controllerInstance, $args);
+            } catch (\ReflectionException $e) {
+                throw new Exception($e->getMessage());
             }
         }
 
