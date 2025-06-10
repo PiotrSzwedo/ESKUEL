@@ -4,14 +4,8 @@ namespace App\Controllers;
 use App\Services\ViewService;
 use Core\Response;
 
-class HomeController
+class HomeController extends Controller
 {
-    private ViewService $view;
-
-    public function __construct()
-    {
-        $this->view = new ViewService();
-    }
 
     public function index()
     {
@@ -20,6 +14,6 @@ class HomeController
             'items' => ['Jeden', 'Dwa', 'Trzy']
         ];
 
-        return $this->view->render('home.tpl', $data);
+        return $this->viewService->render('home.tpl', $data);
     }
 }
