@@ -64,7 +64,7 @@ export default {
       }
 
       try {
-        const response = await fetch("/eskuelmyadmin/index.php?path=/form", {
+        const response = await fetch("/eskuelmyadmin/form", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
