@@ -4,27 +4,27 @@
 
     <label>
       Host
-      <input type="text" v-model="host" required placeholder="np. localhost" />
+      <input type="text" v-model="host" required placeholder="np. localhost"/>
     </label>
 
     <label>
       Nazwa bazy danych
-      <input type="text" v-model="database" required placeholder="np. my_database" />
+      <input type="text" v-model="database" required placeholder="np. my_database"/>
     </label>
 
     <label>
       Użytkownik
-      <input type="text" v-model="username" required placeholder="np. root" />
+      <input type="text" v-model="username" required placeholder="np. root"/>
     </label>
 
     <label>
       Hasło (opcjonalne)
-      <input type="password" v-model="password" placeholder="hasło" />
+      <input type="password" v-model="password" placeholder="hasło"/>
     </label>
 
     <label>
       Port
-      <input type="number" v-model.number="port" required min="1" max="65535" />
+      <input type="number" v-model.number="port" required min="1" max="65535"/>
     </label>
 
     <button type="submit" :disabled="!isValid">Dodaj</button>
@@ -43,7 +43,7 @@ export default {
       database: '',
       username: '',
       password: '',
-      port: 22,
+      port: 3310,
       error: '',
       success: false,
     };
@@ -54,7 +54,7 @@ export default {
     }
   },
   methods: {
-    submitForm() {
+    async submitForm() {
       this.error = '';
       this.success = false;
 
@@ -63,22 +63,43 @@ export default {
         return;
       }
 
-      console.log({
-        host: this.host,
-        database: this.database,
-        username: this.username,
-        password: this.password,
-        port: this.port
-      });
+      try {
+        const response = await fetch("/eskuelmyadmin/index.php?path=/form", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            host: this.host,
+            database: this.database,
+            username: this.username,
+            password: this.password,
+            port: this.port
+          })
+        });
 
-      this.success = true;
+        if (!response.ok) {
+          throw new Error(`Server returned ${response.status}`);
+        }
 
-      // Opcjonalnie wyczyść formularz:
-      // this.host = '';
-      // this.database = '';
-      // this.username = '';
-      // this.password = '';
-      // this.port = 22;
+        const result = await response.json();
+
+        if (result.ok) {
+          this.host = '';
+          this.database = '';
+          this.username = '';
+          this.password = '';
+          this.port = 22;
+
+          this.success = true;
+        } else {
+          this.success = false;
+          console.error("Server error:", result.message || result);
+        }
+      } catch (error) {
+        console.error("Fetch error:", error);
+        this.success = false;
+      }
     }
   }
 }
@@ -91,7 +112,7 @@ export default {
   padding: 2em;
   background: #fff;
   border-radius: 8px;
-  box-shadow: 0 0 12px rgba(0,0,0,0.1);
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #333;
 }
@@ -103,13 +124,13 @@ h2 {
 }
 
 label {
-  display: block;
+  display: flex;
+  flex-direction: column;
   margin-bottom: 1em;
   font-weight: 600;
 }
 
 input {
-  width: 100%;
   padding: 0.5em;
   margin-top: 0.3em;
   border: 1px solid #ccc;

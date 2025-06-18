@@ -16,7 +16,12 @@ class Request
         $this->headers = getallheaders();
 
         if (in_array($this->method, ['POST'])) {
-            $this->body = $_POST;
+            if (!empty($_POST)) {
+                $this->body = $_POST;
+            }else{
+                $rawInput = file_get_contents('php://input');
+                $this->body = $this->parseRawInput($rawInput);
+            }
         } elseif (in_array($this->method, ['PUT', 'PATCH', 'DELETE'])) {
             $rawInput = file_get_contents('php://input');
             $this->body = $this->parseRawInput($rawInput);
