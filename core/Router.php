@@ -25,6 +25,7 @@ class Router
     private function normalizeUri(string $uri): string
     {
         $uri = preg_replace('#/+#', '/', $uri);
+        $uri = str_replace($this->prefix, '', $uri);
 
 
         if ($uri !== '/') {
@@ -109,7 +110,7 @@ class Router
 
     public function redirect(string $uri) :void
     {
-        header("Location: $this->prefix/index.php?path=$uri");
+        header("Location: $this->prefix/$uri");
         exit;
     }
 }

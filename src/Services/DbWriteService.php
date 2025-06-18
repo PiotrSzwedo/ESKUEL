@@ -10,7 +10,7 @@ class DbWriteService
 
     public function __construct($directory = "databases")
     {
-        $this->directory = __DIR__. "./../../". $directory;
+        $this->directory = __DIR__. "/../../". $directory;
     }
 
     public function writeDatabase(string $host, string $database, string $username, string $password = '', int $port = 22): bool {
