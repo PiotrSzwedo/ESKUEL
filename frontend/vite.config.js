@@ -5,20 +5,27 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [vue()],
-  root: 'frontend',
+  root: './',
   base: './',
   build: {
-    outDir: './../../resources',
+    manifest: true,
+    outDir: './../../resources/js/',
     emptyOutDir: true,
     rollupOptions: {
       input: {
         form: path.resolve(__dirname, 'form.ts'),
-        app: path.resolve(__dirname, "matherBoard.ts")
+        panel: path.resolve(__dirname, 'matherBoard.ts')
+      },
+      output: {
+        entryFileNames: '[name].js',
+        chunkFileNames: '[name].js',
+        assetFileNames: '[name][extname]'
       }
     }
   },
   resolve: {
     alias: {
+      'vue': 'vue/dist/vue.esm-bundler.js',
       '@': path.resolve(__dirname, './frontend')
     }
   }
