@@ -8,11 +8,12 @@ export default defineConfig({
   root: 'frontend',
   base: './',
   build: {
-    outDir: '../../resources',
+    outDir: './../../resources',
     emptyOutDir: true,
     rollupOptions: {
       input: {
         form: path.resolve(__dirname, 'form.ts'),
+        app: path.resolve(__dirname, "matherBoard.ts")
       }
     }
   },
