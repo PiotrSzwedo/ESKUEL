@@ -8,12 +8,14 @@ use ReflectionMethod;
 
 class Router
 {
+    private string $prefix;
+    private bool $is_redirect;
     private ViewService $viewService;
-
-    public function __construct(ViewService $viewService){
+    public function __construct(ViewService $viewService, string $prefix = "/eskuelmyadmin", bool $is_redirect = false){
         $this->viewService = $viewService;
+        $this->prefix = $prefix;
+        $this->is_redirect = $is_redirect;
     }
-    private string $prefix = "/eskuelmyadmin";
     protected array $routes = [
         'GET' => [],
         'POST' => [],
@@ -26,7 +28,6 @@ class Router
     {
         $uri = preg_replace('#/+#', '/', $uri);
         $uri = str_replace($this->prefix, '', $uri);
-
 
         if ($uri !== '/') {
             $uri = rtrim($uri, '/');
@@ -110,7 +111,11 @@ class Router
 
     public function redirect(string $uri) :void
     {
-        header("Location: $this->prefix/$uri");
+        if ($this->is_redirect) {
+            header("Location: $this->prefix/$uri");
+        }else{
+            header("Location: $this->prefix/index?path=$uri");
+        }
         exit;
     }
 }
