@@ -53,7 +53,7 @@ class FormController extends Controller
             return Response::json(["success" => false, "message" => "Missing required fields"], 422);
         }
 
-        $isFileSaved =  $this->dbWriter->updateDatabase($id . ".json", $host, $database, $username, $password);
+        $isFileSaved =  $this->dbWriter->updateDatabase($id . ".json", $host, $database, $username, $password, $port);
 
         if ($isFileSaved){
             $database = $this->dbWriter->readDatabase($id . ".json");
