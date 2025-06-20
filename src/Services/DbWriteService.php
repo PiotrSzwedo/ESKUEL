@@ -15,14 +15,13 @@ class DbWriteService
 
     public function writeDatabase(string $host, string $database, string $username, string $password = '', int $port = 22): bool {
         try {
-
-            $fileName = sprintf('%s_%s.json', time(), bin2hex(random_bytes(4)));
+            $fileName = sprintf('%s%s.json', time(), bin2hex(random_bytes(4)));
 
             $data = [
                 'host' => $host,
                 'database' => $database,
                 'username' => $username,
-                'password' => password_hash($password, PASSWORD_DEFAULT),
+                'password' => $password == '' ? '' : password_hash($password, PASSWORD_DEFAULT),
                 'port' => $port,
                 'created_at' => date('c')
             ];
@@ -31,6 +30,11 @@ class DbWriteService
 
             $filePath = rtrim($this->directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $fileName;
 
+            while(file_exists($filePath)){
+                $fileName = sprintf('%s%s.json', time(), bin2hex(random_bytes(random_int(4, 9999999999))));
+                $filePath = rtrim($this->directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $fileName;
+            }
+
             return file_put_contents($filePath, $content) !== false;
 
         }   catch (RandomException $e) {
@@ -38,15 +42,38 @@ class DbWriteService
         }
     }
 
+    public function updateDatabase(string $fileName, string $host, string $database, string $username, string $password = '', int $port = 22): bool
+    {
+        $data = [
+            'host' => $host,
+            'database' => $database,
+            'username' => $username,
+            'password' => $password == '' ? '' : password_hash($password, PASSWORD_DEFAULT),
+            'port' => $port,
+            'created_at' => date('c')
+        ];
+
+        $content = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
+        $filePath = rtrim($this->directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $fileName;
+
+        if (file_exists($filePath)) {
+            return file_put_contents($filePath, $content) !== false;
+        }
+
+        return false;
+    }
 
     public function readDatabase($fileName) :array
     {
-        if (file_exists($fileName)){
-            $filePath = $this->directory . DIRECTORY_SEPARATOR . $fileName;
+        $filePath = $this->directory . DIRECTORY_SEPARATOR . $fileName;
+        if (file_exists($filePath)) {
             $content = file_get_contents($filePath);
 
             if ($content){
-                return json_decode($content, true);
+                $data = json_decode($content, true);
+                $data["id"] = str_replace(".json", "", $fileName);
+                return $data;
             }
         }
 
@@ -69,7 +96,9 @@ class DbWriteService
             $filePath = $this->directory . DIRECTORY_SEPARATOR . $file;
             $content = file_get_contents($filePath);
             if ($content) {
-                $databases[] = json_decode($content, true);
+                $data = json_decode($content, true);
+                $data["id"] = str_replace(".json", "", $file);
+                $databases[] = $data;
             }
         }
 

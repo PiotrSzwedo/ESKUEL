@@ -40,4 +40,26 @@ class FormController extends Controller
 
         return Response::json(["success" => false], 500);
     }
+
+    public function update(Request $request) :string{
+        $host = $request->input('host', null);
+        $database = $request->input('database', null);
+        $username = $request->input('username', null);
+        $password = $request->input('password', '');
+        $port = $request->input('port', null);
+        $id = $request->input('id', null);
+
+        if ($host == null || $database == null || $username == null || $port == null || $id == null) {
+            return Response::json(["success" => false, "message" => "Missing required fields"], 422);
+        }
+
+        $isFileSaved =  $this->dbWriter->updateDatabase($id . ".json", $host, $database, $username, $password);
+
+        if ($isFileSaved){
+            $database = $this->dbWriter->readDatabase($id . ".json");
+            return Response::json(["success" => true, "database" => $database], 200);
+        }
+
+        return Response::json(["success" => false], 500);
+    }
 }
