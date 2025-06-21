@@ -8,7 +8,7 @@ class DbWriteService
 {
     private string $directory;
 
-    public function __construct($directory = "databases")
+    public function __construct($directory = "storage". DIRECTORY_SEPARATOR . "databases")
     {
         $this->directory = __DIR__. "/../../". $directory;
     }
