@@ -43,7 +43,7 @@ export default {
       database: '',
       username: '',
       password: '',
-      port: 3310,
+      port: 3306,
       error: '',
       success: false,
     };
