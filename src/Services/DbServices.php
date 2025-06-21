@@ -84,4 +84,24 @@ class DbServices
             return null;
         }
     }
+
+    public function isDatabaseConnected(): bool
+    {
+        if (!isset($_SESSION['db_connection'])) {
+            return false;
+        }
+
+        $conn = $_SESSION['db_connection'];
+
+        try {
+            $dsn = "mysql:host={$conn['host']};port={$conn['port']};dbname={$conn['database']};charset=utf8mb4";
+            $pdo = new PDO($dsn, $conn['username'], $conn['password'], [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            ]);
+            return true;
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+
 }
