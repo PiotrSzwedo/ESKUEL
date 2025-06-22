@@ -17,4 +17,24 @@ class Response
         header('Content-Type: application/json');
         return json_encode($data);
     }
+
+    public static function file(string $path, int $status = 200, string $filename = null): void
+    {
+        if (!file_exists($path)) {
+            self::html('<h1>404 Not Found</h1>', 404);
+            return;
+        }
+
+        http_response_code($status);
+
+        $mimeType = mime_content_type($path) ?: 'application/octet-stream';
+        header('Content-Type: ' . $mimeType);
+
+        if ($filename) {
+            header('Content-Disposition: attachment; filename="' . basename($filename) . '"');
+        }
+
+        header('Content-Length: ' . filesize($path));
+        readfile($path);
+    }
 }

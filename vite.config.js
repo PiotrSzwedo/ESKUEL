@@ -1,4 +1,3 @@
-// vite.config.js
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import path from 'path'
@@ -6,8 +5,8 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [
-      vue(),
-      tailwindcss(),
+    vue(),
+    tailwindcss()
   ],
   root: './resources/frontend',
   base: './',
@@ -29,6 +28,9 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      '@codemirror/state': path.resolve(__dirname, 'node_modules/@codemirror/state'),
+      '@codemirror/view': path.resolve(__dirname, 'node_modules/@codemirror/view'),
+      '@codemirror/language': path.resolve(__dirname, 'node_modules/@codemirror/language'),
       'vue': 'vue/dist/vue.esm-bundler.js',
       '@': path.resolve(__dirname, './')
     }
