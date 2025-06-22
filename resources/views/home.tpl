@@ -3,5 +3,5 @@
 {block name="title"}Strona główna{/block}
 
 {block name="content"}
-
+    <sql-editor></sql-editor>
 {/block}

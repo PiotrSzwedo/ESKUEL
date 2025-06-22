@@ -5,6 +5,7 @@
 {*    {vite_entry file="form.ts"}*}
     <script type="module" src="http://localhost:5173/form.ts"></script>
     <title>{block name="title"}Domyślny tytuł{/block} | EskuelMyAdmin </title>
+    <link href="style.css" type="text/css">
     <style>
         .footer {
             background-color: #f9f9f9;
@@ -82,13 +83,19 @@
         .navbar-links a:hover {
             color: #007acc;
         }
+
+        .navbar-brand img{
+            width: 50%;
+        }
     </style>
 </head>
 <body>
 
 <nav class="navbar">
     <div class="navbar-container">
-        <div class="navbar-brand">ESKUEL</div>
+        <div class="navbar-brand">
+            <img src="/eskuelmyadmin/storage/?file=logo.svg" alt="eskuelMYAdmin"/>
+        </div>
         <ul class="navbar-links">
             <li><a href="/eskuelmyadmin/form">Dodaj bazę</a></li>
             <li><a href="/eskuelmyadmin/databases">Moje bazy</a></li>
