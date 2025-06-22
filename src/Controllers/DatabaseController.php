@@ -36,4 +36,8 @@ class DatabaseController extends Controller
             "databases" => $databases,
         ], 200);
     }
+
+    public function sqlShow(): string{
+        return Response::html($this->viewService->render("sql.tpl"));
+    }
 }

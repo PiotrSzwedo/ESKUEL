@@ -49,7 +49,7 @@ class ViewService
             $this->manifest = json_decode(file_get_contents($manifestPath), true);
         }
 
-        $file = "../". $params['file'];
+        $file = $params['file'];
 
         if (!isset($this->manifest[$file])) {
             return "<!-- vite_entry: file '{$file}' not found in manifest -->";

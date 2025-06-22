@@ -71,4 +71,36 @@ class DatabaseConnectionController extends Controller
             return Response::json(["success" => false, "message" => "connection error"], 500);
         }
     }
+
+    public function getMetadata(): string
+    {
+        $pdo = $this->dbService->getPdoFromSession();
+        if (!$pdo) return Response::json(['error' => 'No connection'], 400);
+
+        $tables = $pdo->query("SHOW TABLES")->fetchAll(PDO::FETCH_COLUMN);
+
+        $result = [];
+        foreach ($tables as $table) {
+            $columns = $pdo->query("SHOW COLUMNS FROM `$table`")->fetchAll(PDO::FETCH_COLUMN);
+            $result[$table] = $columns;
+        }
+
+        return Response::json($result);
+    }
+
+    public function executeSQL(Request $request): string
+    {
+        $sql = $request->input("query", null);
+
+        if ($sql == null || empty(trim($sql))) {
+            return Response::json(["success" => false, "message" => "Missing required fields"], 422);
+        }
+
+        $pdo = $this->dbService->getPdoFromSession();
+        if (!$pdo) return Response::json(["success" => false, "message" => "Connection error"], 500);
+
+        $result = $this->dbService->execute($pdo, $sql);
+
+        return Response::json([...$result], 200);
+    }
 }

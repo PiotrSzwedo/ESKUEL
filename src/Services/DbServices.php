@@ -9,6 +9,10 @@ class DbServices
 {
     public function connect(string $host, string $database, string $username, string $password = '', int $port = 3306): false|PDO
     {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
         try {
             $dsn = "mysql:host={$host};port={$port};dbname={$database};charset=utf8mb4";
 
@@ -38,23 +42,38 @@ class DbServices
         }
     }
 
-    public function execute(PDO $pdo, string $sql, array $params = []): false|int|array
+    public function execute(PDO $pdo, string $sql): false|array
     {
         try {
             $stmt = $pdo->prepare($sql);
-            $stmt->execute($params);
+            $success = $stmt->execute();
 
-            if (stripos(trim($sql), 'select') === 0) {
-                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            if ($stmt->columnCount() > 0) {
+                return [
+                    'type' => 'result',
+                    'rows' => $stmt->fetchAll(PDO::FETCH_ASSOC),
+                    'columns' => array_map(
+                        fn($i) => $stmt->getColumnMeta($i)['name'] ?? 'col' . $i,
+                        range(0, $stmt->columnCount() - 1)
+                    ),
+                ];
+
             }
 
-            return $stmt->rowCount();
+            return [
+                'type' => 'message',
+                'affected' => $stmt->rowCount(),
+                'message' => "Zapytanie wykonane poprawnie. Zmieniono wierszy: " . $stmt->rowCount(),
+            ];
 
         } catch (PDOException $e) {
-            error_log("Błąd wykonania zapytania SQL: " . $e->getMessage());
-            return false;
+            return [
+                'type' => 'error',
+                'error' => $e->getMessage()
+            ];
         }
     }
+
 
     public function getPdoFromSession(): ?PDO
     {
@@ -87,9 +106,14 @@ class DbServices
 
     public function isDatabaseConnected(): bool
     {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
         if (!isset($_SESSION['db_connection'])) {
             return false;
         }
+
 
         $conn = $_SESSION['db_connection'];
 
@@ -98,10 +122,15 @@ class DbServices
             $pdo = new PDO($dsn, $conn['username'], $conn['password'], [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             ]);
-            return true;
+
+            if ($pdo){
+                return true;
+            }
         } catch (PDOException $e) {
             return false;
         }
+
+        return false;
     }
 
 }

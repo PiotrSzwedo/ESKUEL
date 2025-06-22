@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    {vite_entry file="matherBoard.ts"}
+{*    {vite_entry file="matherBoard.ts"}*}
     <script type="module" src="http://localhost:5173/matherBoard.ts"></script>
     <meta charset="UTF-8" />
     <title>{block name="title"}Domyślny tytuł{/block}</title>

@@ -20,3 +20,4 @@ $router->get('/storage', [\App\Controllers\StorageController::class, 'index']);
 $router->get('/databases-list', [DatabaseController::class, 'show']);
 $router->post('/database-conn', [DatabaseConnectionController::class, 'store']);
 $router->patch('/database', [FormController::class, 'update']);
+$router->post('/db/execute', [DatabaseConnectionController::class, 'executeSQL']);
