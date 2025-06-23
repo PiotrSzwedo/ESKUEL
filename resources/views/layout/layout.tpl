@@ -4,7 +4,7 @@
 {*    {vite_entry file="matherBoard.ts"}*}
     <script type="module" src="http://localhost:5173/matherBoard.ts"></script>
     <meta charset="UTF-8" />
-    <title>{block name="title"}Domyślny tytuł{/block}</title>
+    <title>{block name="title"}Domyślny tytuł{/block} | eskuelMyAdmin</title>
     <style>
         .footer {
             background-color: #f9f9f9;

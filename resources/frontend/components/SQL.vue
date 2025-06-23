@@ -45,6 +45,15 @@ import { HighlightStyle, syntaxHighlighting } from '@codemirror/language'
 import { defaultKeymap, indentWithTab } from '@codemirror/commands'
 import { closeBracketsKeymap } from '@codemirror/autocomplete'
 
+const props = defineProps({
+  prefix: {
+    type: String,
+    required: true,
+    default: '',
+  }
+})
+
+
 const editor = ref(null)
 let view = null
 
@@ -59,7 +68,7 @@ const schema = {
 }
 
 async function sendQuery(sql) {
-  const response = await fetch('/eskuelmyadmin/db/execute', {
+  const response = await fetch(`${props.prefix}/db/execute`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ query: sql }),

@@ -3,5 +3,5 @@
 {block name="title"}SQL{/block}
 
 {block name="content"}
-    <sql-editor></sql-editor>
+    <sql-editor :prefix="'{$prefix}'"></sql-editor>
 {/block}

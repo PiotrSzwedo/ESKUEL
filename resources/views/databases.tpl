@@ -3,5 +3,5 @@
 {block name="title"}Bazy danych{/block}
 
 {block name="content"}
-    <databases-list></databases-list>
+    <databases-list :prefix="'{$prefix}'"></databases-list>
 {/block}

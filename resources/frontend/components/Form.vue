@@ -37,6 +37,15 @@
 <script>
 export default {
   name: 'DatabaseAddForm',
+
+  props: {
+    prefix: {
+      type: String,
+      required: true,
+      default: '',
+    }
+  },
+
   data() {
     return {
       host: '',
@@ -64,7 +73,7 @@ export default {
       }
 
       try {
-        const response = await fetch("/eskuelmyadmin/form", {
+        const response = await fetch(`${this.prefix}/form`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

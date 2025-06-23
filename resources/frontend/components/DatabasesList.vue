@@ -87,6 +87,15 @@ import {data} from "autoprefixer";
 
 export default {
   name: "DatabasesList",
+
+  props: {
+    prefix: {
+      type: String,
+      required: true,
+      default: '',
+    }
+  },
+
   data() {
     return {
       databases: [],
@@ -116,7 +125,7 @@ export default {
         id: this.edited.id
       };
 
-      const response = await fetch("/eskuelmyadmin/database", {
+      const response = await fetch(`${this.prefix}/database`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -163,7 +172,7 @@ export default {
 
     async fetchDatabases() {
       try {
-        const response = await fetch("/eskuelmyadmin/databases-list");
+        const response = await fetch(`${this.prefix}/databases-list`);
 
         if (!response.ok) throw new Error("Błąd ładowania danych");
 
@@ -197,7 +206,7 @@ export default {
       };
 
       try {
-        const response = await fetch("/eskuelmyadmin/database-conn", {
+        const response = await fetch(`${this.prefix}/database-conn`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
