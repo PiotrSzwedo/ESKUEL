@@ -2,13 +2,12 @@
 
 return [
     // by default the prefix is
-    // the directory where escuela my admin is installed,
+    // the directory where escuelamyadmin is installed,
     // the prefix will not be there if eskuelmyadmin is installed in the root directory of the web server
     "prefix" => getPrefix(),
 
-    // defines how links are created
-    // by default by redirecting to index
-    "path_with_redirection_to_index" => true
+    // link to access the built frontend files
+    "link_serving_the_built_frontend" => "/vite",
 ];
 
 function getPrefix(): string

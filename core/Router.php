@@ -9,12 +9,11 @@ use ReflectionMethod;
 class Router
 {
     private string $prefix;
-    private bool $is_redirect;
+
     private ViewService $viewService;
-    public function __construct(ViewService $viewService, string $prefix = "/eskuelmyadmin", bool $is_redirect = false){
+    public function __construct(ViewService $viewService, string $prefix = "/eskuelmyadmin"){
         $this->viewService = $viewService;
         $this->prefix = $prefix;
-        $this->is_redirect = $is_redirect;
     }
     protected array $routes = [
         'GET' => [],
@@ -111,11 +110,6 @@ class Router
 
     public function redirect(string $uri) :void
     {
-        if ($this->is_redirect) {
-            header("Location: $this->prefix/$uri");
-        }else{
-            header("Location: $this->prefix/index?path=$uri");
-        }
-        exit;
+        header("Location: $this->prefix/$uri");
     }
 }

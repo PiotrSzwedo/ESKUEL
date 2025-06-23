@@ -23,6 +23,8 @@ class ViewService
 
     public function render(string $template, array $data = []): string
     {
+        global $routerConfig;
+        $data['prefix'] = $routerConfig['prefix'];
         foreach ($data as $key => $value) {
             $this->smarty->assign($key, $value);
         }
@@ -35,6 +37,8 @@ class ViewService
 
     public function viteEntry(array $params, Template $smarty): string
     {
+        global $routerConfig;
+
         if (!isset($params['file'])) {
             return '<!-- vite_entry: missing file param -->';
         }
@@ -64,7 +68,7 @@ class ViewService
             }
         }
 
-        $tags .= '<script type="module" src="/eskuelmyadmin/resources/js/' . $entry['file'] . '"></script>';
+        $tags .= '<script type="module" src="'. $routerConfig["prefix"].$routerConfig['link_serving_the_built_frontend'] . '?file=' . $entry['file'] . '"></script>';
 
         return $tags;
     }
