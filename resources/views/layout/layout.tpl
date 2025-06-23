@@ -86,6 +86,22 @@
         .navbar-brand img{
             width: 50%;
         }
+
+        .navbar-links li .disconnect{
+            border: 2px solid red;
+            border-radius: 20px;
+            padding: 5px 15px;
+            color: red;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .navbar-links li .disconnect:hover{
+            color: white;
+            background: red;
+        }
     </style>
 </head>
 <body>
@@ -93,13 +109,14 @@
     <nav class="navbar">
         <div class="navbar-container">
             <div class="navbar-brand">
-                <a href="/eskuelmyadmin">
-                <img src="/eskuelmyadmin/storage/?file=logo.svg" alt="eskuelMYAdmin"/>
+                <a href="{$prefix}">
+                    <img src="{$prefix}/storage/?file=logo.svg" alt="eskuelMYAdmin"/>
                 </a>
             </div>
             <ul class="navbar-links">
-                <li><a href="/eskuelmyadmin/sql">SQL</a></li>
-                <li><a href="/eskuelmyadmin/eskuel">ESKUEL</a></li>
+                <li><a href="{$prefix}/sql">SQL</a></li>
+                <li><a href="{$prefix}/eskuel">ESKUEL</a></li>
+                <li><a href="{$prefix}/disconnect" class="disconnect">Rozłącz</a></li>
             </ul>
         </div>
     </nav>

@@ -90,15 +90,16 @@
     </style>
 </head>
 <body>
-
 <nav class="navbar">
     <div class="navbar-container">
         <div class="navbar-brand">
-            <img src="/eskuelmyadmin/storage/?file=logo.svg" alt="eskuelMYAdmin"/>
+            <a href="{$prefix}">
+                <img src="{$prefix}/storage/?file=logo.svg" alt="eskuelMYAdmin"/>
+            </a>
         </div>
         <ul class="navbar-links">
-            <li><a href="/eskuelmyadmin/form">Dodaj bazę</a></li>
-            <li><a href="/eskuelmyadmin/databases">Moje bazy</a></li>
+            <li><a href="{$prefix}/form">Dodaj bazę</a></li>
+            <li><a href="{$prefix}/databases">Moje bazy</a></li>
         </ul>
     </div>
 </nav>

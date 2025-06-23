@@ -42,6 +42,19 @@ class DbServices
         }
     }
 
+    public function disconnect(): bool
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if (isset($_SESSION['db_connection'])) {
+            unset($_SESSION['db_connection']);
+        }
+
+        return true;
+    }
+
     public function execute(PDO $pdo, string $sql): false|array
     {
         try {

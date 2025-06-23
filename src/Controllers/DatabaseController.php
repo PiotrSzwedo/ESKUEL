@@ -7,6 +7,7 @@ use App\Services\DbWriteService;
 use App\Services\ViewService;
 use Core\Request;
 use Core\Response;
+use Core\Router;
 use PDO;
 
 class DatabaseController extends Controller
@@ -39,5 +40,14 @@ class DatabaseController extends Controller
 
     public function sqlShow(): string{
         return Response::html($this->viewService->render("sql.tpl"));
+    }
+
+    public function disconnect(): void
+    {
+        global $router;
+
+        if ($this->dbService->disconnect()){
+            $router->redirect("/");
+        }
     }
 }

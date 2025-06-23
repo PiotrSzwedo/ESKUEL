@@ -13,12 +13,12 @@ class HomeController extends Controller
         parent::__construct($viewService);
     }
 
-    public function index()
+    public function index(): string
     {
         if (!$this->dbServices->isDatabaseConnected()) {
             return Response::html($this->viewService->render("databases.tpl"));
         }
 
-        return $this->viewService->render('home.tpl');
+        return $this->viewService->render('sql.tpl');
     }
 }
