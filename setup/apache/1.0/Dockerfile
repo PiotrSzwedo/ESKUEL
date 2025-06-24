@@ -56,3 +56,5 @@ RUN a2enmod php8.3
 RUN a2enmod rewrite
 
 EXPOSE 80/tcp
+
+CMD [ "apache2ctl", "-D", "FOREGROUND" ]
