@@ -8,6 +8,8 @@ return [
 
     // link to access the built frontend files
     "link_serving_the_built_frontend" => "/vite",
+
+    'link_serving_the_css_files' => '/css'
 ];
 
 function getPrefix(): string

@@ -19,6 +19,7 @@ class ViewService
         $this->smarty->caching = Smarty::CACHING_LIFETIME_CURRENT;
 
         $this->smarty->registerPlugin('function', 'vite_entry', [$this, 'viteEntry']);
+        $this->smarty->registerPlugin('function', 'style_css', [$this, 'cssStyle']);
     }
 
     public function render(string $template, array $data = []): string
@@ -71,5 +72,18 @@ class ViewService
         $tags .= '<script type="module" src="'. $routerConfig["prefix"].$routerConfig['link_serving_the_built_frontend'] . '?file=' . $entry['file'] . '"></script>';
 
         return $tags;
+    }
+
+    public function cssStyle(array $params, Template $smarty): string
+    {
+        if (!isset($params['file'])) {
+            return '<!-- style: missing file param -->';
+        }
+
+        global $routerConfig;
+
+        $uri =  $routerConfig["prefix"] .  $routerConfig['link_serving_the_css_files']. '?file=' . $params['file'];
+
+        return '<link rel="stylesheet" href="' . $uri . '">';
     }
 }
