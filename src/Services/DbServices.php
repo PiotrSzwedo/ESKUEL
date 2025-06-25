@@ -81,8 +81,8 @@ class DbServices
 
         } catch (PDOException $e) {
             return [
-                'type' => 'error',
-                'error' => $e->getMessage()
+                'type' => 'message',
+                'message' => $e->getMessage()
             ];
         }
     }
