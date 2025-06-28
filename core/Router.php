@@ -9,12 +9,8 @@ use ReflectionMethod;
 class Router
 {
     private string $prefix;
-
     private ViewService $viewService;
-    public function __construct(ViewService $viewService, string $prefix = "/eskuelmyadmin"){
-        $this->viewService = $viewService;
-        $this->prefix = $prefix;
-    }
+
     protected array $routes = [
         'GET' => [],
         'POST' => [],
@@ -23,44 +19,56 @@ class Router
         'DELETE' => [],
     ];
 
+    protected array $middleware = []; // Globalne middleware
+    protected array $routeMiddleware = []; // Middleware per trasa
+
+    public function __construct(ViewService $viewService, string $prefix = "/eskuelmyadmin"){
+        $this->viewService = $viewService;
+        $this->prefix = $prefix;
+    }
+
     private function normalizeUri(string $uri): string
     {
         $uri = preg_replace('#/+#', '/', $uri);
         $uri = str_replace($this->prefix, '', $uri);
-
-        if ($uri !== '/') {
-            $uri = rtrim($uri, '/');
-        }
-
-        return $uri;
+        return $uri !== '/' ? rtrim($uri, '/') : $uri;
     }
 
-    public  function get($uri, $action): void
+    public function get($uri, $action, array $middleware = []): void
+    {
+        $this->addRoute('GET', $uri, $action, $middleware);
+    }
+
+    public function post($uri, $action, array $middleware = []): void
+    {
+        $this->addRoute('POST', $uri, $action, $middleware);
+    }
+
+    public function put($uri, $action, array $middleware = []): void
+    {
+        $this->addRoute('PUT', $uri, $action, $middleware);
+    }
+
+    public function patch($uri, $action, array $middleware = []): void
+    {
+        $this->addRoute('PATCH', $uri, $action, $middleware);
+    }
+
+    public function delete($uri, $action, array $middleware = []): void
+    {
+        $this->addRoute('DELETE', $uri, $action, $middleware);
+    }
+
+    private function addRoute(string $method, string $uri, $action, array $middleware = []): void
     {
         $normalized = $this->normalizeUri($uri);
-        $this->routes['GET'][$normalized] = ["class" => $action[0], "method" => $action[1]];
+        $this->routes[$method][$normalized] = ["class" => $action[0], "method" => $action[1]];
+        $this->routeMiddleware[$method][$normalized] = $middleware;
     }
 
-
-    public function post($uri, $action): void
+    public function addGlobalMiddleware(string $middlewareClass): void
     {
-        $normalized = $this->normalizeUri($uri);
-        $this->routes['POST'][$normalized] = ["class" => $action[0], "method" => $action[1]];
-    }
-
-    public function put($uri, $action): void{
-        $normalized = $this->normalizeUri($uri);
-        $this->routes['PUT'][$normalized] = ["class" => $action[0], "method" => $action[1]];
-    }
-
-    public function patch($uri, $action): void{
-        $normalized = $this->normalizeUri($uri);
-        $this->routes['PATCH'][$normalized] = ["class" => $action[0], "method" => $action[1]];
-    }
-
-    public function delete($uri, $action): void{
-        $normalized = $this->normalizeUri($uri);
-        $this->routes['DELETE'][$normalized] = ["class" => $action[0], "method" => $action[1]];
+        $this->middleware[] = $middlewareClass;
     }
 
     public function dispatch($uri, $method)
@@ -68,48 +76,65 @@ class Router
         $uri = parse_url($uri, PHP_URL_PATH);
         $uri = $this->normalizeUri($uri);
 
-        if (isset($this->routes[$method][$uri])) {
-            $route = $this->routes[$method][$uri];
-            $controllerClass = $route['class'] ?? null;
-            $controllerMethod = $route['method'] ?? null;
+        if (!isset($this->routes[$method][$uri])) {
+            return $this->viewService->render("errors/404.tpl");
+        }
 
-            if (!$controllerClass || !class_exists($controllerClass)) {
-                throw new Exception("Kontroler {$controllerClass} nie istnieje.");
-            }
+        foreach ($this->middleware as $middlewareClass) {
+            $this->runMiddleware($middlewareClass);
+        }
 
-            $controllerInstance = Container::make($controllerClass);
-            if (!method_exists($controllerInstance, $controllerMethod)) {
-                throw new Exception("Metoda {$controllerMethod} nie istnieje w klasie {$controllerClass}");
-            }
+        foreach ($this->routeMiddleware[$method][$uri] ?? [] as $middlewareClass) {
+            $this->runMiddleware($middlewareClass);
+        }
 
-            $methodReflection = new ReflectionMethod($controllerInstance, $controllerMethod);
-            $params = $methodReflection->getParameters();
+        $route = $this->routes[$method][$uri];
+        $controllerInstance = Container::make($route['class']);
 
-            $args = [];
-            foreach ($params as $param) {
-                $paramClass = $param->getType()?->getName();
+        if (!method_exists($controllerInstance, $route['method'])) {
+            throw new Exception("Metoda {$route['method']} nie istnieje w klasie {$route['class']}");
+        }
 
-                if ($paramClass && class_exists($paramClass)) {
-                    $args[] = \Core\Container::make($paramClass);
-                } elseif ($param->isDefaultValueAvailable()) {
-                    $args[] = $param->getDefaultValue();
-                } else {
-                    throw new Exception("Nie można rozwiązać parametru: {$param->getName()}");
-                }
-            }
+        $methodReflection = new ReflectionMethod($controllerInstance, $route['method']);
+        $args = [];
 
-            try {
-                return $methodReflection->invokeArgs($controllerInstance, $args);
-            } catch (\ReflectionException $e) {
-                throw new Exception($e->getMessage());
+        foreach ($methodReflection->getParameters() as $param) {
+            $paramClass = $param->getType()?->getName();
+            if ($paramClass && class_exists($paramClass)) {
+                $args[] = Container::make($paramClass);
+            } elseif ($param->isDefaultValueAvailable()) {
+                $args[] = $param->getDefaultValue();
+            } else {
+                throw new Exception("Nie można rozwiązać parametru: {$param->getName()}");
             }
         }
 
-        return $this->viewService->render("errors/404.tpl");
+        return $methodReflection->invokeArgs($controllerInstance, $args);
     }
 
-    public function redirect(string $uri) :void
+    private function runMiddleware(string $middlewareClass): void
+    {
+        if (!class_exists($middlewareClass)) {
+            throw new Exception("Middleware {$middlewareClass} nie istnieje.");
+        }
+
+        $instance = Container::make($middlewareClass);
+
+        if (!method_exists($instance, 'handle')) {
+            throw new Exception("Middleware {$middlewareClass} musi implementować metodę handle.");
+        }
+
+        $response = $instance->handle();
+
+        if ($response !== null) {
+            echo $response;
+            exit;
+        }
+    }
+
+    public function redirect(string $uri): void
     {
         header("Location: $this->prefix/$uri");
+        exit;
     }
 }
