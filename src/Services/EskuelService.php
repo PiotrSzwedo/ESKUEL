@@ -11,7 +11,7 @@ class EskuelService
         $this->eskuelPath = $eskuelPath;
     }
 
-    public function translateIntoSQL(array $stringArray): string
+    public function translateIntoSQL(string $string): string
     {
         $keyPhrases = $this->getEskuelKeyPhrases();
 
@@ -21,12 +21,14 @@ class EskuelService
 
         $translated = [];
 
-        foreach ($stringArray as $word) {
+        $tokens = preg_split('/\s+/', $string, -1, PREG_SPLIT_NO_EMPTY);
+
+        foreach ($tokens as $word) {
             $key = mb_strtolower($word);
             if (isset($keyPhrases[$key])) {
                 $translated[] = $keyPhrases[$key];
             } else {
-                $translated[] = '"' . $word . '"';
+                $translated[] = $word;
             }
         }
 

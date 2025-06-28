@@ -12,7 +12,7 @@ class StorageController extends Controller
     {
         $file  = $request->input("file", null);
 
-        $filePath = __DIR__ . "/../../storage/public/" . $file;
+        $filePath = __DIR__ . "/../../../storage/public/" . $file;
 
         if (file_exists($filePath)) {
             return Response::file($filePath);
@@ -25,7 +25,7 @@ class StorageController extends Controller
     {
         $file  = $request->input("file", null);
 
-        $filePath = __DIR__ . "/../../resources/js/" . $file;
+        $filePath = __DIR__ . "/../../../resources/js/" . $file;
 
         if (file_exists($filePath)) {
             return Response::js($filePath);
@@ -37,7 +37,7 @@ class StorageController extends Controller
     public function css(Request $request): ?string{
         $file  = $request->input("file", null);
 
-        $filePath = __DIR__ . "/../../resources/css/" . $file;
+        $filePath = __DIR__ . "/../../../resources/css/" . $file;
 
         if (file_exists($filePath)) {
             return Response::css($filePath);

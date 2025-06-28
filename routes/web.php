@@ -21,7 +21,10 @@ if ($db->isDatabaseConnected()) {
     $router->get("/disconnect", [InquiriesDatabaseController::class, 'disconnect']);
     $router->post('/db/execute', [DatabaseConnectionController::class, 'executeSQL']);
 
-    $router->get("/eskuel", [InquiriesEskuelController::class, 'show']);
+    $router->get("/eskuel", [DatabaseController::class, 'eskuelShow']);
+
+    $router->post("/eskuel/execute", [InquiriesEskuelController::class, 'execute']);
+    $router->get("/eskuel/keywords", [InquiriesEskuelController::class, 'show']);
 }
 
 $router->get('/form', [FormController::class, 'show']);

@@ -13,8 +13,6 @@ class DatabaseController extends Controller
     protected DbWriteService $dbWriter;
     protected DbServices $dbService;
 
-    protected \PDO $PDO;
-
     public function __construct(DbWriteService $dbWriter, ViewService $view, DbServices $dbServices){
         $this->dbWriter = $dbWriter;
         $this->dbService = $dbServices;
@@ -30,5 +28,10 @@ class DatabaseController extends Controller
 
     public function sqlShow(): string{
         return Response::html($this->viewService->render("sql.tpl"));
+    }
+
+    public function eskuelShow(): string
+    {
+        return Response::html($this->viewService->render("eskuel.tpl"));
     }
 }

@@ -2,9 +2,9 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8" />
-{*    {vite_entry file="form.ts"}*}
+    {vite_entry file="form.ts"}
     <script type="module" src="http://localhost:5173/form.ts"></script>
-    <title>{block name="title"}Domyślny tytuł{/block} | eskuelMYadmin </title>
+    <title>{block name="title"}{/block} | eskuelMYadmin </title>
     {style_css file="navbar.css"}
 </head>
 <body>

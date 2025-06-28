@@ -3,6 +3,7 @@
 namespace App\Controllers\Inquiries;
 
 use App\Controllers\Controller;
+use App\Services\DbServices;
 use App\Services\EskuelService;
 use App\Services\ViewService;
 use Core\Request;
@@ -12,8 +13,11 @@ class EskuelController extends Controller
 {
     private EskuelService $eskuelService;
 
-    public function __construct(EskuelService $eskuelService, ViewService $viewService){
+    private DbServices $dbService;
+
+    public function __construct(EskuelService $eskuelService, DbServices $dbServices, ViewService $viewService){
         $this->eskuelService = $eskuelService;
+        $this->dbService = $dbServices;
         parent::__construct($viewService);
     }
 
@@ -51,5 +55,21 @@ class EskuelController extends Controller
             "total_pages" => $totalPages,
             "key_words" => $chunkedKeywords[$pageIndex]
         ], 200);
+    }
+
+    public function execute(Request $request): string
+    {
+        $sql = $this->eskuelService->translateIntoSQL($request->input("query", ""));
+
+        if ($sql == null || empty(trim($sql))) {
+            return Response::json(["success" => false, "message" => "Missing required fields"], 422);
+        }
+
+        $pdo = $this->dbService->getPdoFromSession();
+        if (!$pdo) return Response::json(["success" => false, "message" => "Connection error"], 500);
+
+        $result = $this->dbService->execute($pdo, $sql);
+
+        return Response::json([...$result], 200);
     }
 }
