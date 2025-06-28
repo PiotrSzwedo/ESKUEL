@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\Inquiries;
 
+use App\Controllers\Controller;
 use App\Services\DbWriteService;
 use App\Services\ViewService;
 use Core\Request;
@@ -14,10 +15,6 @@ class FormController extends Controller
     public function __construct(DbWriteService $dbWriter, ViewService $view){
         $this->dbWriter = $dbWriter;
         parent::__construct($view);
-    }
-    public function show() : string
-    {
-        return Response::html($this->viewService->render('form.tpl'));
     }
 
     public function store(Request $request) :string

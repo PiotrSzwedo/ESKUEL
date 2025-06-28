@@ -1,6 +1,7 @@
 <?php
-namespace App\Controllers;
+namespace App\Controllers\Views;
 
+use App\Controllers\Controller;
 use App\Services\DbServices;
 use App\Services\ViewService;
 use Core\Response;

@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\Views;
 
+use App\Controllers\Controller;
 use Core\Request;
 use Core\Response;
 

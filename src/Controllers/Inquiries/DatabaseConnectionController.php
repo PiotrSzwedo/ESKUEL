@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\Inquiries;
 
+use App\Controllers\Controller;
 use App\Services\DbServices;
 use App\Services\DbWriteService;
 use App\Services\ViewService;
