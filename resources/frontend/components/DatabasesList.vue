@@ -31,60 +31,101 @@
     </ul>
   </div>
 
-  <div v-show="isEditing" class="fixed w-full h-full top-[0] bg-[#000000a6]">
-    <form @submit.prevent="submitForm"
-          class="translate-y-1/4 max-w-[400px] mx-[auto] my-[1em] p-[2em] bg-[#fff] rounded-[8px] [box-shadow:0_0_12px_rgba(0,_0,_0,_0.1)] font-['Segoe_UI',_Tahoma,_Geneva,_Verdana,_sans-serif] text-[#333]">
-      <h2 class="mb-[1.5em] text-center text-[#222]">Edytujesz bazę: {{ edited.database + ':' + edited.host }}</h2>
+  <transition name="fade">
+    <div
+        v-if="isEditing"
+        class="fixed inset-0 bg-[#000000ab] bg-opacity-60 flex items-center justify-center z-50"
+    >
+      <form
+          @submit.prevent="submitForm"
+          class="relative w-full max-w-md mx-auto p-8 bg-white rounded-lg shadow-lg font-['Segoe_UI',_Tahoma,_Geneva,_Verdana,_sans-serif] text-[#333]"
+      >
+        <!-- Przycisk zamykania -->
+        <button
+            type="button"
+            @click="closeEditing"
+            aria-label="Zamknij"
+            class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl font-bold leading-none cursor-pointer"
+        >
+          &times;
+        </button>
 
-      <label class="flex flex-col mb-[1em] font-semibold">
-        Host
-        <input
-            class="p-[0.5em] mt-[0.3em] border-[1px] border-[solid] border-[#ccc] rounded-[4px] text-[1em] [transition:border-color_0.3s_ease] focus:outline-[none] focus:border-[#4A90E2] focus:[box-shadow:0_0_4px_#4A90E2]"
-            type="text" v-model="edited.host" required placeholder="np. localhost"/>
-      </label>
+        <h2 class="mb-6 text-center text-2xl font-semibold text-[#222]">
+          Edytujesz bazę: {{ edited.database }} : {{ edited.host }}
+        </h2>
 
-      <label class="flex flex-col mb-[1em] font-semibold">
-        Nazwa bazy danych
-        <input
-            class="p-[0.5em] mt-[0.3em] border-[1px] border-[solid] border-[#ccc] rounded-[4px] text-[1em] [transition:border-color_0.3s_ease] focus:outline-[none] focus:border-[#4A90E2] focus:[box-shadow:0_0_4px_#4A90E2]"
-            type="text" v-model="edited.database" required placeholder="np. my_database"/>
-      </label>
+        <label class="flex flex-col mb-4 font-semibold">
+          Host
+          <input
+              type="text"
+              v-model="edited.host"
+              required
+              placeholder="np. localhost"
+              class="p-2 mt-1 border border-gray-300 rounded focus:outline-none focus:border-blue-500 focus:shadow-outline"
+          />
+        </label>
 
-      <label class="flex flex-col mb-[1em] font-semibold">
-        Użytkownik
-        <input
-            class="p-[0.5em] mt-[0.3em] border-[1px] border-[solid] border-[#ccc] rounded-[4px] text-[1em] [transition:border-color_0.3s_ease] focus:outline-[none] focus:border-[#4A90E2] focus:[box-shadow:0_0_4px_#4A90E2]"
-            type="text" v-model="edited.username" required placeholder="np. root"/>
-      </label>
+        <label class="flex flex-col mb-4 font-semibold">
+          Nazwa bazy danych
+          <input
+              type="text"
+              v-model="edited.database"
+              required
+              placeholder="np. my_database"
+              class="p-2 mt-1 border border-gray-300 rounded focus:outline-none focus:border-blue-500 focus:shadow-outline"
+          />
+        </label>
 
-      <label class="flex flex-col mb-[1em] font-semibold">
-        Hasło (opcjonalne)
-        <input
-            class="p-[0.5em] mt-[0.3em] border-[1px] border-[solid] border-[#ccc] rounded-[4px] text-[1em] [transition:border-color_0.3s_ease] focus:outline-[none] focus:border-[#4A90E2] focus:[box-shadow:0_0_4px_#4A90E2]"
-            type="password" v-model="edited.password" placeholder="hasło"/>
-      </label>
+        <label class="flex flex-col mb-4 font-semibold">
+          Użytkownik
+          <input
+              type="text"
+              v-model="edited.username"
+              required
+              placeholder="np. root"
+              class="p-2 mt-1 border border-gray-300 rounded focus:outline-none focus:border-blue-500 focus:shadow-outline"
+          />
+        </label>
 
-      <label class="flex flex-col mb-[1em] font-semibold">
-        Port
-        <input
-            class="p-[0.5em] mt-[0.3em] border-[1px] border-[solid] border-[#ccc] rounded-[4px] text-[1em] [transition:border-color_0.3s_ease] focus:outline-[none] focus:border-[#4A90E2] focus:[box-shadow:0_0_4px_#4A90E2]"
-            type="number" v-model.number="edited.port" required min="1" max="65535"/>
-      </label>
+        <label class="flex flex-col mb-4 font-semibold">
+          Hasło (opcjonalne)
+          <input
+              type="password"
+              v-model="edited.password"
+              placeholder="hasło"
+              class="p-2 mt-1 border border-gray-300 rounded focus:outline-none focus:border-blue-500 focus:shadow-outline"
+          />
+        </label>
 
-      <button
-          class="w-full p-[0.75em] [transition:background-color_0.3s_ease] text-[1.1em] rounded-[4px] font-bold border-[none] text-[white] hover:bg-[#357ABD] bg-[#4A90E2] cursor-pointer"
-          type="submit"> Zmień
-      </button>
+        <label class="flex flex-col mb-6 font-semibold">
+          Port
+          <input
+              type="number"
+              v-model.number="edited.port"
+              required
+              min="1"
+              max="65535"
+              class="p-2 mt-1 border border-gray-300 rounded focus:outline-none focus:border-blue-500 focus:shadow-outline"
+          />
+        </label>
 
-      <p v-if="edited.error" class="text-[#d93025] mt-[1em] text-center">{{ edited.error }}</p>
-      <p v-if="edited.success" class="text-[#188038] mt-[1em] text-center">Baza danych została dodana!</p>
-    </form>
-  </div>
+        <button
+            type="submit"
+            class="w-full bg-blue-600 text-white font-bold py-3 rounded hover:bg-blue-700 transition-colors"
+        >
+          Zmień
+        </button>
+
+        <p v-if="edited.error" class="text-red-600 mt-4 text-center">{{ edited.error }}</p>
+        <p v-if="edited.success" class="text-green-600 mt-4 text-center">
+          Baza danych została zmieniona!
+        </p>
+      </form>
+    </div>
+  </transition>
 </template>
 
 <script>
-import {data} from "autoprefixer";
-
 export default {
   name: "DatabasesList",
 
@@ -114,8 +155,7 @@ export default {
     };
   },
   methods: {
-    async submitForm(){
-
+    async submitForm() {
       const payload = {
         database: this.edited.database,
         host: this.edited.host,
@@ -125,59 +165,74 @@ export default {
         id: this.edited.id
       };
 
-      const response = await fetch(`${this.prefix}/database`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+      try {
+        const response = await fetch(`${this.prefix}/database`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || "Błąd połączenia z bazą");
-      }
-
-      if (response.ok) {
-        this.setEditing(null)
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(errorText || "Błąd połączenia z bazą");
+        }
 
         const awaitedData = await response.json();
 
         if (awaitedData["database"]) {
-          const data = awaitedData["database"]
-
-          const id = data?.id
-
+          const data = awaitedData["database"];
+          const id = data?.id;
           if (id) {
-            const index = this.databases.findIndex(element => element.id === id)
-
-            console.log(index)
-
-            this.databases[index] = data;
+            const index = this.databases.findIndex(element => element.id === id);
+            if(index !== -1) {
+              this.databases.splice(index, 1, data);
+            }
           }
         }
+
+        this.closeEditing();
+      } catch (err) {
+        this.edited.error = err.message || "Coś poszło nie tak";
+        this.edited.success = false;
       }
     },
 
-    setEditing(db){
+    setEditing(db) {
       if (db) {
         this.edited.id = db.id;
         this.edited.host = db.host;
         this.edited.database = db.database;
         this.edited.username = db.username;
         this.edited.port = db.port;
+        this.edited.password = '';
+        this.edited.error = '';
+        this.edited.success = false;
+        this.isEditing = true;
       }
-      this.isEditing = !this.isEditing
+    },
+
+    closeEditing() {
+      this.isEditing = false;
+      this.edited = {
+        host: '',
+        id: '',
+        database: '',
+        username: '',
+        password: '',
+        port: 3306,
+        error: '',
+        success: false,
+      };
     },
 
     async fetchDatabases() {
       try {
         const response = await fetch(`${this.prefix}/databases-list`);
-
         if (!response.ok) throw new Error("Błąd ładowania danych");
 
         const data = await response.json();
-
         this.databases = data?.databases ?? [];
       } catch (err) {
         console.error("Błąd:", err);
@@ -219,7 +274,7 @@ export default {
           throw new Error(errorText || "Błąd połączenia z bazą");
         }
 
-        const result = await response.json();
+        await response.json();
         alert("Połączenie nawiązane pomyślnie!");
       } catch (error) {
         alert(`Błąd: ${error.message}`);
@@ -231,3 +286,12 @@ export default {
   },
 };
 </script>
+
+<style>
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+</style>
